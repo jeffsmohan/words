@@ -1,6 +1,7 @@
 # Corpus data we don't want checked in
-data/
+corpora/*/data/
 
+# Standard files
 .DS_Store
 node_modules
 /dist
