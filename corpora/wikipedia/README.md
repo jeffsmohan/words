@@ -29,6 +29,14 @@ In order to reproduce the `wordcounts.txt` file, you can follow the steps here. 
 
    This will write many files named `corpora/wikipedia/data/??/wiki_??`.
 
-3. Count the word frequencies from the extracted text using the `wordcount.py` tool:
+3. Activate our Python virtualenv.
 
-   `python wordcount.py -i corpora/wikipedia/data -o corpora/wikipedia/data/wordcounts.txt`
+   `./env/bin/activate` (or `. env/bin/activate.fish` for fish shell)
+
+4. Install our Python requirements.
+
+   `pip install -r requirements.txt`
+
+5. Count the word frequencies from the extracted text using the `wikipedia_tools.py` tool:
+
+   `python wikipedia_tools.py -i corpora/wikipedia/data -o corpora/wikipedia/wordcounts.txt`
