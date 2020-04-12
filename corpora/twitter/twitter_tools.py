@@ -2,6 +2,7 @@ import argparse
 import collections
 import re
 import subprocess
+from typing import List
 
 import tqdm
 
@@ -30,10 +31,7 @@ def count_words(args: argparse.Namespace) -> None:
             tweets.append(tweet)
             # For efficiency, only periodically turn the tweets into word counts
             if i % PROCESS_CHUNK_SIZE == 0:
-                word_counts += collections.Counter(
-                    re.sub(WORD_IGNORE_PATTERN, "", word.upper())
-                    for word in " ".join(tweets).split()
-                )
+                word_counts += _count_words_in_tweets(tweets)
                 tweets = []
                 # Also trim the least common words, since they're usually
                 # gibberish and it's helpful to keep memory pressure down
@@ -41,7 +39,8 @@ def count_words(args: argparse.Namespace) -> None:
                     dict(word_counts.most_common(MAX_WORD_COUNT_LENGTH))
                 )
                 progress.update(PROCESS_CHUNK_SIZE)
-    del word_counts[""]
+        word_counts += _count_words_in_tweets(tweets)
+        del word_counts[""]
 
     # Output the word counts to a file
     if not args.quiet:
@@ -49,6 +48,14 @@ def count_words(args: argparse.Namespace) -> None:
     _output_word_counts(word_counts, args.output)
     if not args.quiet:
         print(f"Done! See word counts in {args.output}.")
+
+
+def _count_words_in_tweets(tweets: List[str]) -> collections.Counter:
+    """Return a Counter with the word counts from the given list of tweets."""
+    return collections.Counter(
+        re.sub(WORD_IGNORE_PATTERN, "", word.upper())
+        for word in " ".join(tweets).split()
+    )
 
 
 def _output_word_counts(word_counts: collections.Counter, output_file: str) -> None:
