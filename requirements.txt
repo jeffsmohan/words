@@ -3,4 +3,5 @@ flake8
 gutenberg
 pre-commit
 pydocstyle
+pytest
 tqdm
