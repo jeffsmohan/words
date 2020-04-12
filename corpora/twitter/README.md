@@ -33,14 +33,18 @@ In order to reproduce the `wordcounts.txt` file, you can follow the steps here. 
    wget http://snap.stanford.edu/data/bigdata/twitter7/tweets2009-12.txt.gz -P corpora/twitter/data
    ```
 
-2. Activate our Python virtualenv.
+2. Pre-process the tweets to pull out just the content. (This can take ~30 minutes, and produces a ~45GB file.)
+
+   `zgrep -Eh '^W\t.*' corpora/twitter/data/* | sed 's/^W//g' > corpora/twitter/data/tweets.txt`
+
+3. Activate our Python virtualenv.
 
    `./env/bin/activate` (or `. env/bin/activate.fish` for fish shell)
 
-3. Install our Python requirements.
+4. Install our Python requirements.
 
    `pip install -r requirements.txt`
 
-4. Count the word frequencies from the extracted text using the `twitter_tools.py` tool:
+5. Count the word frequencies from the extracted text using the `twitter_tools.py` tool. (This can take ~10 hours to process.)
 
-   `python twitter_tools.py -i corpora/twitter/data -o corpora/twitter/wordcounts.txt`
+   `python corpora/twitter/twitter_tools.py count_words -i corpora/twitter/data/tweets.txt -o corpora/twitter/wordcounts.txt`

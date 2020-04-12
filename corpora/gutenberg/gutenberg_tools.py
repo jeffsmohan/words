@@ -1,5 +1,6 @@
 import argparse
 import collections
+import itertools
 import re
 import tqdm
 from gutenberg.acquire import get_metadata_cache, load_etext
@@ -8,6 +9,17 @@ from gutenberg import Error as GutenbergError
 from typing import List
 
 
+# Mirrors: https://www.gutenberg.org/MIRRORS.ALL
+MIRRORS = [
+    'http://www.mirrorservice.org/sites/ftp.ibiblio.org/pub/docs/books/gutenberg/',
+    'http://eremita.di.uminho.pt/gutenberg/',
+    'http://mirror.csclub.uwaterloo.ca/gutenberg/',
+    'http://www.gutenberg.org/dirs/',
+    'http://mirrors.xmission.com/gutenberg/',
+    'https://gutenberg.pglaf.org/',
+    'http://aleph.gutenberg.org/',
+    'http://gutenberg.readingroo.ms/',
+]
 WORD_IGNORE_PATTERN = r'[^A-Z]'
 
 
@@ -36,22 +48,27 @@ def prime_text_cache(args: argparse.Namespace) -> None:
     if not args.quiet:
         print('Downloading Project Gutenberg book texts...')
     etexts = get_etexts('language', args.language)
-    etexts_iter = tqdm.tqdm(etexts) if not args.quiet else etexts
+    # Cycle through mirrors so as not to overload anyone's servers and get rate-limited
+    etexts_with_mirrors = list(zip(etexts, itertools.cycle(MIRRORS)))
+    etexts_iter = tqdm.tqdm(etexts_with_mirrors) if not args.quiet else etexts_with_mirrors
 
     success_count = 0
     total_count = 0
     try:
-        for etext in etexts_iter:
+        for etext, mirror in etexts_iter:
             total_count += 1
             try:
-                content = load_etext(etext)
+                content = load_etext(etext, mirror=mirror)
                 success_count += 1
             except GutenbergError as e:
                 if not args.quiet:
-                    print('Failure: ', e)
+                    print(f'Failure (mirror: {mirror}) ', e)
                 continue
     except KeyboardInterrupt:
         pass
+    except Exception as e:
+        print('Error with mirror: ', mirror, etext)
+        raise
 
     if not args.quiet:
         print(f'{success_count} / {total_count} books downloaded to cache')

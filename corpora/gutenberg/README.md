@@ -31,7 +31,7 @@ In order to reproduce the `wordcounts.txt` file, you can follow the steps here. 
 
    `pip install -r requirements.txt`
 
-4. Download then entire library of Gutenberg Project books. (This can take a couple days, as the downloads seem quite slow. Progress gets cached, so it's totally fine to quit the process and restart it later; it'll pick up where it left off. In fact, you may need to, as Project Gutenberg seems to rate-limit after a while, which causes the rest of the downloads to fail.)
+4. Download then entire library of Gutenberg Project books. (This can take several days, as the downloads seem quite slow. Progress gets cached, so it's totally fine to quit the process and restart it later; it'll pick up where it left off. In fact, you may need to, as Project Gutenberg seems to rate-limit after a while, which causes the rest of the downloads to fail.)
 
    `python corpora/gutenberg/gutenberg_tools.py prime_text_cache`
 
