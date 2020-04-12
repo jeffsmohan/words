@@ -9,13 +9,12 @@ letter of the alphabet.
 import collections
 import string
 
-
 ALPHABET = set(string.ascii_uppercase)
 
 
 def analyze_words(word_set):
     """
-    Utility to identify uncommon letters in a word set.
+    Identify uncommon letters in a word set.
 
     Returns a list of 2-tuples, each containing the letter of the alphabet and
     how many words in the set have that letter.
@@ -32,7 +31,7 @@ def analyze_words(word_set):
 
 def find_pangrams(word_set, depth_max=6, current_words=None):
     """
-    Finds minimal pangrams out of a set of words.
+    Find minimal pangrams out of a set of words.
 
     Call with any iterable of words, and it returns a list of pangrams,
     if any, sorted by increasing letter count. You can set depth_max to control
@@ -48,7 +47,7 @@ def find_pangrams(word_set, depth_max=6, current_words=None):
         current_words = []
     letters = set(letter for word in current_words for letter in word)
     if letters >= ALPHABET:
-        return [(len(''.join(current_words)), sorted(current_words))]
+        return [(len("".join(current_words)), sorted(current_words))]
 
     # Recursion base case: we're at maximum search depth
     if depth_max == 0:
@@ -62,15 +61,14 @@ def find_pangrams(word_set, depth_max=6, current_words=None):
     word_set = set(word.upper() for word in word_set)
     needed_letters = ALPHABET - letters
     optimized_word_set = sorted(
-        (len(set(word) & needed_letters), word)
-        for word in word_set
+        (len(set(word) & needed_letters), word) for word in word_set
     )
 
     # Otherwise: add a word to the list and recurse
     solutions = []
     while optimized_word_set:
         value, word = optimized_word_set.pop()
-        # Optimization: if value * depth is less than needed letters, branch would be impossible
+        # Optimization: if value * depth < needed letters, branch would be impossible
         if value * depth_max < len(needed_letters):
             continue
         solutions += find_pangrams(
@@ -83,110 +81,110 @@ def find_pangrams(word_set, depth_max=6, current_words=None):
 
 if __name__ == "__main__":
     ANIMALS = [
-        'Aardvark',
-        'Aardwolf',
-        'Addax',
-        'Alligator',
-        'Armadillo',
-        'Badger',
-        'Butterfly',
-        'Capybara',
-        'Caribou',
-        'Cheetah',
-        'Chicken',
-        'Chimpanzee',
-        'Chinchilla',
-        'Chipmunk',
-        'Coyote',
-        'Crocodile',
-        'Dolphin',
-        'Dragonfly',
-        'Earthworm',
-        'Elephant',
-        'Flatworm',
-        'Giraffe',
-        'Gorilla',
-        'Grasshopper',
-        'Hamster',
-        'Hedgehog',
-        'Hippopotamus',
-        'Hornet',
-        'Horse',
-        'Impala',
-        'Jackal',
-        'Jaguar',
-        'Jellyfish',
-        'Kinkajou',
-        'Koala',
-        'Lemming',
-        'Lemur',
-        'Lizard',
-        'Lynx',
-        'Manatee',
-        'Meerkat',
-        'Monkey',
-        'Ocelot',
-        'Okapi',
-        'Penguin',
-        'Porcupine',
-        'Rattlesnake',
-        'Rhinoceros',
-        'Seahorse',
-        'Skylark',
-        'Sloth',
-        'Tapir',
-        'Tortoise',
-        'Turtle',
-        'Vulture',
-        'Wallaby',
-        'Wasp',
-        'Weasel',
-        'Whale',
-        'Wildebeest',
-        'Wolverine',
-        'Wolf',
-        'Wombat',
-        'Worm',
-        'Zebra',
-        'Quail',
-        'Quetzal',
-        'Quokka',
-        'Squirrel',
-        'Gazelle',
-        'Buzzard',
-        'Ox',
-        'Ibex',
-        'Fox',
-        'Squid',
-        'Macaque',
-        'Oryx',
-        'Viper',
-        'Vole',
-        'Vulture',
-        'Muntjac',
-        'Bluejay',
-        'Jerboa',
-        'Jackrabbit',
-        'Kipunji',
-        'Zebu',
-        'Zebrafish',
-        'Zorilla',
-        'Zokor',
-        'Finch',
-        'Frog',
-        'Fossa',
-        'Ferret',
-        'Axolotl',
-        'Hyrax',
-        'Plover',
-        'Pangolin',
-        'Beaver',
-        'Vervet',
-        'Serval',
-        'Civet',
-        'Otter',
-        'Tardigrade',
-        'Narwhal',
+        "Aardvark",
+        "Aardwolf",
+        "Addax",
+        "Alligator",
+        "Armadillo",
+        "Badger",
+        "Butterfly",
+        "Capybara",
+        "Caribou",
+        "Cheetah",
+        "Chicken",
+        "Chimpanzee",
+        "Chinchilla",
+        "Chipmunk",
+        "Coyote",
+        "Crocodile",
+        "Dolphin",
+        "Dragonfly",
+        "Earthworm",
+        "Elephant",
+        "Flatworm",
+        "Giraffe",
+        "Gorilla",
+        "Grasshopper",
+        "Hamster",
+        "Hedgehog",
+        "Hippopotamus",
+        "Hornet",
+        "Horse",
+        "Impala",
+        "Jackal",
+        "Jaguar",
+        "Jellyfish",
+        "Kinkajou",
+        "Koala",
+        "Lemming",
+        "Lemur",
+        "Lizard",
+        "Lynx",
+        "Manatee",
+        "Meerkat",
+        "Monkey",
+        "Ocelot",
+        "Okapi",
+        "Penguin",
+        "Porcupine",
+        "Rattlesnake",
+        "Rhinoceros",
+        "Seahorse",
+        "Skylark",
+        "Sloth",
+        "Tapir",
+        "Tortoise",
+        "Turtle",
+        "Vulture",
+        "Wallaby",
+        "Wasp",
+        "Weasel",
+        "Whale",
+        "Wildebeest",
+        "Wolverine",
+        "Wolf",
+        "Wombat",
+        "Worm",
+        "Zebra",
+        "Quail",
+        "Quetzal",
+        "Quokka",
+        "Squirrel",
+        "Gazelle",
+        "Buzzard",
+        "Ox",
+        "Ibex",
+        "Fox",
+        "Squid",
+        "Macaque",
+        "Oryx",
+        "Viper",
+        "Vole",
+        "Vulture",
+        "Muntjac",
+        "Bluejay",
+        "Jerboa",
+        "Jackrabbit",
+        "Kipunji",
+        "Zebu",
+        "Zebrafish",
+        "Zorilla",
+        "Zokor",
+        "Finch",
+        "Frog",
+        "Fossa",
+        "Ferret",
+        "Axolotl",
+        "Hyrax",
+        "Plover",
+        "Pangolin",
+        "Beaver",
+        "Vervet",
+        "Serval",
+        "Civet",
+        "Otter",
+        "Tardigrade",
+        "Narwhal",
     ]
 
     for count, solution in find_pangrams(ANIMALS):

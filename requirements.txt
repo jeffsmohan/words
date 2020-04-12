@@ -1,2 +1,6 @@
+black
+flake8
 gutenberg
+pre-commit
+pydocstyle
 tqdm
