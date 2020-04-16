@@ -1,11 +1,17 @@
 import argparse
 import collections
+import gzip
 import itertools
+import os
 import re
+from contextlib import closing
+from typing import List
 
 import tqdm
 from gutenberg import Error as GutenbergError
+from gutenberg._domain_model.types import validate_etextno
 from gutenberg.acquire import get_metadata_cache, load_etext
+from gutenberg.acquire.text import _TEXT_CACHE
 from gutenberg.query import get_etexts
 
 # Mirrors: https://www.gutenberg.org/MIRRORS.ALL
@@ -20,6 +26,8 @@ MIRRORS = [
     "http://gutenberg.readingroo.ms/",
 ]
 WORD_IGNORE_PATTERN = r"[^A-Z]"
+MAX_WORD_COUNT_LENGTH = 500_000
+PROCESS_CHUNK_SIZE = 100
 
 
 def prime_query_cache(args: argparse.Namespace) -> None:
@@ -76,25 +84,48 @@ def prime_text_cache(args: argparse.Namespace) -> None:
         print("Done!")
 
 
+def load_etext_from_cache(etextno):
+    """Load an etext only if it's already cached."""
+    etextno = validate_etextno(etextno)
+    cached = os.path.join(_TEXT_CACHE, "{}.txt.gz".format(etextno))
+
+    if not os.path.exists(cached):
+        text = ""
+    else:
+        with closing(gzip.open(cached, "r")) as cache:
+            text = cache.read().decode("utf-8")
+    return text
+
+
 def count_words(args: argparse.Namespace) -> None:
     """Count the words in all Gutenberg books for a given language."""
     # Pull the list of book IDs
     if not args.quiet:
-        print("Processsing Project Gutenberg books...")
+        print("Processing Project Gutenberg books...")
     etexts = get_etexts("language", args.language)
-    etexts_iter = tqdm.tqdm(etexts) if not args.quiet else etexts
+    etexts_iter = tqdm.tqdm(list(etexts)) if not args.quiet else etexts
 
     # Load each book and count the words
     word_counts = collections.Counter()
+    etexts = []
     failed_etexts = []
-    for etext in etexts_iter:
+    for i, etext in enumerate(etexts_iter):
         try:
-            content = load_etext(etext)
+            etexts.append(load_etext_from_cache(etext))
         except GutenbergError as e:
             failed_etexts.append(etext)
             print("Failure: ", e)
             continue
-        word_counts += _count_words_in_content(content)
+        # For efficiency, only periodically turn the texts into word counts
+        if i % PROCESS_CHUNK_SIZE == 0:
+            word_counts += _count_words_in_etexts(etexts)
+            etexts = []
+            # Also trim the least common words, since they're usually
+            # gibberish and it's helpful to keep memory pressure down
+            word_counts = collections.Counter(
+                dict(word_counts.most_common(MAX_WORD_COUNT_LENGTH))
+            )
+    word_counts += _count_words_in_etexts(etexts)
     del word_counts[""]
 
     # Output the word counts to a file
@@ -110,10 +141,11 @@ def count_words(args: argparse.Namespace) -> None:
         print(f"Done! See word counts in {args.output}.")
 
 
-def _count_words_in_content(content: str) -> collections.Counter:
+def _count_words_in_etexts(etexts: List[str]) -> collections.Counter:
     """Return a Counter with the word counts from the given text."""
     return collections.Counter(
-        re.sub(WORD_IGNORE_PATTERN, "", word.upper()) for word in content.split()
+        re.sub(WORD_IGNORE_PATTERN, "", word.upper())
+        for word in " ".join(etexts).split()
     )
 
 
