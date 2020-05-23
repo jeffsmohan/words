@@ -25,7 +25,7 @@ IGNORE_PATTERNS = [
 
 def clean_word(word: str) -> str:
     """Ensure words are uppercase and don't contain special characters."""
-    return re.sub(r"[^A-Z]", "", word.upper())
+    return re.sub(r"[^A-Z]", "", word.split()[0].upper())
 
 
 def read_word_lists(paths: List[str], ignore_patterns: List[str]) -> List[set]:
